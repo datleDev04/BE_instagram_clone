@@ -5,7 +5,7 @@ const DOCUMENT_NAME = "Story";
 const COLLECTION_NAME = "Storys";
 
 const storySchema = new mongoose.Schema({
-    userId: {
+    user_id: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,

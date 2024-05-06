@@ -5,17 +5,15 @@ const DOCUMENT_NAME = "CloseFriend";
 const COLLECTION_NAME = "CloseFriends";
 
 const closeFriendSchema = new mongoose.Schema({
-  user: {
+  user_id: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  closeFriends: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
+  closeFriends: {
+    type:  [{ type: Schema.Types.ObjectId, ref: "User" }],
+    default: []
+  }, 
 },
 {
     timestamps: true,

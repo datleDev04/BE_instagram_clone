@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
 // schema User variables
-const DOCUMENT_NAME = "Token";
-const COLLECTION_NAME = "Tokens";
+const DOCUMENT_NAME = "Black_Token";
+const COLLECTION_NAME = "Black_Tokens";
 
 const tokenSchema = new mongoose.Schema({
     user_id: {
@@ -11,15 +11,23 @@ const tokenSchema = new mongoose.Schema({
         required: true
     },
 
-    refresh_token: {
+    access_token: {
         type: String,
         required: true
-    },
+      },
+
+    expired: {
+        type: Date,
+        default: Date.now()
+    }
+
 },
 {
     timestamps: true,
     versionKey: false,
     collection: COLLECTION_NAME,
 })
+
+tokenSchema.index({createdAt: 1}, {expireAfterSeconds: 7*24*60*60});
 
 export default mongoose.model(DOCUMENT_NAME, tokenSchema)

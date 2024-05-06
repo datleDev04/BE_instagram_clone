@@ -24,7 +24,7 @@ app.use(express.urlencoded({
 }))
 
 // Routes
-app.use("/", router)
+app.use("/api", router)
 
 // Error handler
 app.all("*", (req, res, next) => {
