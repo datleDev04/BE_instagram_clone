@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
   {
     user_name: {
       type: String,
+      unique: true,
       required: true,
     },
     email: {
@@ -40,46 +41,25 @@ const userSchema = new mongoose.Schema(
         ref: "Gender",
         required: true
     },
+    phone: {
+      type: String,
+      unique: true,
+      required: true
+    },
 
     address: {
       type: String,
     },
 
-    post: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
-    storage: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
-
-    followers: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
-    following: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
     verify_code: {
-      type: string
-    },
+      type: String
+    },    
 
     privateAccount: {
       type: Boolean,
       default: false
-    }
+    },
+
   },
   {
     timestamps: true,
