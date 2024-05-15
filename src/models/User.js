@@ -36,10 +36,9 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
-    gender: { 
-        type: Schema.Types.ObjectId,
-        ref: "Gender",
-        required: true
+    gender: {
+      type: Number,
+      default: 0,
     },
     phone: {
       type: String,

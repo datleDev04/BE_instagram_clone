@@ -6,7 +6,7 @@ import User from "../models/User.js"
 
 export const authMiddleware = async (req, res, next) => {
     const accessToken = req.get("Authorization")?.split(" ").at(1)
-    console.log(accessToken)
+    // console.log(accessToken)
     try {
         if (!accessToken) throw new ApiError(StatusCodes.UNAUTHORIZED, "Not authorized")
 

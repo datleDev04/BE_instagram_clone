@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 // schema User variables
-const DOCUMENT_NAME = "Post";
-const COLLECTION_NAME = "Posts";
+const DOCUMENT_NAME = "Reel";
+const COLLECTION_NAME = "Reels";
 
 
 const reelSchema = new mongoose.Schema({
@@ -26,14 +26,6 @@ const reelSchema = new mongoose.Schema({
     likes: [{
         type: Schema.Types.ObjectId,
         ref: "Like"
-    }],
-    comments: [{
-        type: Schema.Types.ObjectId,
-        ref: "Comment"
-    }],
-    share: [{
-        type: Schema.Types.ObjectId,
-        ref: "Share"
     }],
 
     isArchive: {

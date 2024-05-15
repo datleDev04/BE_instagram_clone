@@ -19,6 +19,11 @@ const commentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",
         required: true
+    },
+    reel_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reel",
+        required: true
     }
 }, {
     timestamps: true,

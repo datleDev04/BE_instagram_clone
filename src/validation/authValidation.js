@@ -1,8 +1,6 @@
 import Joi from "joi";
 import ApiError from "../utils/ApiError.js";
 import {
-  OBJECT_ID_RULE,
-  OBJECT_ID_RULE_MESSAGE,
   PHONE_NUMBER_RULE,
   PHONE_NUMBER_RULE_MESSAGE,
   validateBeforeCreateOrUpdate,
@@ -16,10 +14,7 @@ class authValidation {
       email: Joi.string().email().trim(),
       password: Joi.string().min(6).trim(),
       confirm_password: Joi.string().min(6).valid(Joi.ref("password")).trim(),
-      gender: Joi.string()
-        .required()
-        .pattern(OBJECT_ID_RULE)
-        .message(OBJECT_ID_RULE_MESSAGE),
+      gender: Joi.number().required(),
       phone: Joi.string()
         .required()
         .pattern(PHONE_NUMBER_RULE)
