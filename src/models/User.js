@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
+    avatar_publicId: {
+      type: String,
+    },
+    avatar_fileName: {
+      type: String,
+    },
     bio: {
       type: String,
     },

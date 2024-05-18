@@ -49,7 +49,7 @@ class authController {
 
             res.status(StatusCodes.OK).json({
                 message: "Refresh token successfully",
-                metaData: newAccess_token
+                accessToken: newAccess_token
             })
         } catch (error) {
             next(error)

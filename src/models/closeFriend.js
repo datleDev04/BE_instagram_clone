@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-
+import mongoose, { Schema } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2"
 // schema User variables
 const DOCUMENT_NAME = "CloseFriend";
 const COLLECTION_NAME = "CloseFriends";
@@ -20,5 +20,7 @@ const closeFriendSchema = new mongoose.Schema({
     versionKey: false,
     collection: COLLECTION_NAME,
 });
+
+closeFriendSchema.plugin(mongoosePaginate)
 
 export default mongoose.model(DOCUMENT_NAME, closeFriendSchema);
