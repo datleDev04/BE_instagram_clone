@@ -7,6 +7,7 @@ const connectDatabase = () => {
       .connect(environment.db.url)
       .then(() => {
         console.log("DATABASE connect success !!!");
+        // console.log(environment.db.url)
       })
       .catch((error) => {
         console.log("DATABASE connect failed !!!",error);
