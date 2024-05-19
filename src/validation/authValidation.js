@@ -1,8 +1,6 @@
 import Joi from "joi";
 import ApiError from "../utils/ApiError.js";
 import {
-  PHONE_NUMBER_RULE,
-  PHONE_NUMBER_RULE_MESSAGE,
   validateBeforeCreateOrUpdate,
 } from "../utils/validators.js";
 import { StatusCodes } from "http-status-codes";
@@ -10,15 +8,10 @@ import { StatusCodes } from "http-status-codes";
 class authValidation {
   static registerValidation = async (req, res, next) => {
     const correctCondition = Joi.object({
-      user_name: Joi.string().min(3).max(20).trim(),
-      email: Joi.string().email().trim(),
-      password: Joi.string().min(6).trim(),
-      confirm_password: Joi.string().min(6).valid(Joi.ref("password")).trim(),
-      gender: Joi.number().required(),
-      phone: Joi.string()
-        .required()
-        .pattern(PHONE_NUMBER_RULE)
-        .message(PHONE_NUMBER_RULE_MESSAGE),
+      user_name: Joi.string().min(3).max(20).trim().required(),
+      email: Joi.string().email().trim().required(),
+      password: Joi.string().min(6).trim().required(),
+      confirm_password: Joi.string().min(6).valid(Joi.ref("password")).trim().required(),
     });
 
     try {
@@ -33,8 +26,8 @@ class authValidation {
 
   static loginValidation = async (req, res, next) => {
     const correctCondition = Joi.object({
-      email: Joi.string().email().trim(),
-      password: Joi.string().min(6).trim(),
+      email: Joi.string().email().trim().required(),
+      password: Joi.string().min(6).trim().required(),
     });
 
     try {

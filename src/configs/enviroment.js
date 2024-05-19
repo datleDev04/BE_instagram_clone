@@ -1,4 +1,3 @@
-import 'dotenv/config'
 
 const dev = {
     app: {

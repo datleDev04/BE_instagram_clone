@@ -8,6 +8,8 @@ const authRouter = express.Router()
 authRouter.post("/register", authValidation.registerValidation, authController.register)
 authRouter.post("/login", authValidation.loginValidation, authController.login)
 authRouter.post("/logout", authMiddleware,  authController.logout)
+authRouter.post("/forgot-password", authController.forgotPassword)  
+authRouter.post("/reset-password/:token", authController.resetPassword)  
 
 
 authRouter.post("/refresh-token", authController.refreshToken)

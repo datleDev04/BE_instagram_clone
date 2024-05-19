@@ -44,12 +44,10 @@ const userSchema = new mongoose.Schema(
 
     gender: {
       type: Number,
-      default: 0,
     },
     phone: {
       type: String,
       unique: true,
-      required: true
     },
 
     address: {
@@ -57,6 +55,10 @@ const userSchema = new mongoose.Schema(
     },
 
     verify_code: {
+      type: String
+    },    
+
+    resetPassword_Token: {
       type: String
     },    
 
