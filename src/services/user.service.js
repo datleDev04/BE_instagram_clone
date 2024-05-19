@@ -6,6 +6,7 @@ import Follower from "../models/Follower.js"
 import Following from "../models/Following.js"
 import closeFriend from "../models/closeFriend.js"
 import Blocked from "../models/Blocked.js"
+import bcrypt from 'bcrypt'
 
 class userService {
 
@@ -45,12 +46,19 @@ class userService {
             }
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, {
-            ...req.body,
-            avatar: uploadedImage.secure_url,
-            avatar_publicId: uploadedImage.public_id,
-            avatar_fileName: `avatar-insta/${uploadedImage.original_filename}`
-        }, { new: true })
+        let updatedData = { ...req.body };
+
+        if (req.body.password) {
+            updatedData.password = bcrypt.hashSync(req.body.password, 10);
+        }
+        
+        if (uploadedImage) {
+            updatedData.avatar = uploadedImage.secure_url;
+            updatedData.avatar_publicId = uploadedImage.public_id;
+            updatedData.avatar_fileName = `avatar-insta/${uploadedImage.original_filename}`;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, { ...updatedData } , { new: true })
 
         if (!updatedUser) throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, getStatusCode(StatusCodes.INTERNAL_SERVER_ERROR))
 
