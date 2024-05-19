@@ -6,8 +6,6 @@ class authController {
         try {
             const newUser = await authService.register(req.body)
 
-            //if !newUser thr
-
             res.status(StatusCodes.OK).json({
                 message: "Registration successfully",
                 metaData: newUser
@@ -37,6 +35,29 @@ class authController {
 
             res.status(StatusCodes.OK).json({
                 message: "Logout successfully",
+            })
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static forgotPassword = async (req, res, next) => {
+        try {
+            await authService.forgotPassword(req.body)
+
+            res.status(StatusCodes.OK).json({
+                message: "send mail forgot password successfully",
+            })
+        } catch (error) {
+            next(error);
+        }
+    }
+    static resetPassword = async (req, res, next) => {
+        try {
+            await authService.resetPassword(req)
+
+            res.status(StatusCodes.OK).json({
+                message: "reset password successfully",
             })
         } catch (error) {
             next(error);

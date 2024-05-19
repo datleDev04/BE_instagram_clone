@@ -6,22 +6,18 @@ import Black_tokens from "../models/Black_tokens.js"
 import { StatusCodes } from "http-status-codes"
 import Token from "../models/token.js"
 import sendEmail from "../utils/mails.js"
-import { activeAccount } from "../mail/activeAcount.js"
+import {  mailActiveAccount } from "../mail/mailActiveAcount.js"
+import { mailForgotPassword } from "../mail/mailForgotPassword.js"
+
 class authService {
     static register = async (reqBody) => {
-        const { user_name, email, password, phone ,confirm_password, gender } = reqBody
+        const { user_name, email, password ,confirm_password } = reqBody
 
 
         // check exitsted Email
         const existedEmail = await User.findOne({ email })
         if (existedEmail) {
             throw new ApiError(409, "Email already existed")
-        }
-
-        // check exitsted Phone
-        const existedPhone = await User.findOne({ phone })
-        if (existedPhone) {
-            throw new ApiError(409, "Phone number already existed")
         }
 
         // check password and confirm_password
@@ -36,7 +32,7 @@ class authService {
 
         sendEmail(email,
             "Active your Instagram account",
-            activeAccount(
+            mailActiveAccount(
                 `${process.env.CLIENT_BASE_URL}/verify?email=${email}&code=${verifyCode}`
             )
         )
@@ -46,15 +42,9 @@ class authService {
         const newUser = await User.create({
             user_name,
             email,
-            phone,
             password: bcrypt.hashSync(password, 10),
-            gender,
             verify_code: verifyCode,
         })
-
-        if (!newUser) {
-            throw new ApiError(500, "Couldn't create User")
-        }
 
         return newUser
     }
@@ -152,6 +142,47 @@ class authService {
         if (!user) throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid vertify code")
 
         user.verify_code = null
+    }
+
+    static forgotPassword = async (reqBody) => {
+        const { email } = reqBody
+
+        if (!email) throw new ApiError(StatusCodes.BAD_REQUEST, "email is required")
+
+        const user = await User.findOne({ email })
+        if (!user) throw new ApiError(StatusCodes.NOT_FOUND, "User not found")
+
+        user.resetPassword_Token = jwtUtils.createAccessToken(user._id)
+
+        user.save()
+
+        sendEmail(
+            user.email,
+            "Reset Your Instagram Account Password",
+            mailForgotPassword(
+                `${process.env.CLIENT_BASE_URL}/auth/reset-password/${user.resetPassword_Token}`
+            )
+        )
+    }
+
+    static resetPassword = async ( req ) => {
+        const { password, confirm_password } = req.body
+
+        const resetPassword_Token = req.params.token
+
+        const decode = jwtUtils.decodeToken(resetPassword_Token)
+
+        const user = await User.findOne({ _id: decode.user_id })
+        if (!user) throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid or Token expired")
+
+        if (password !== confirm_password) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Passwords don't match")
+        }
+
+        user.password = bcrypt.hashSync(password, 10)
+        user.resetPassword_Token = null
+
+        user.save()
     }
 }
 

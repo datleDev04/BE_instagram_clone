@@ -1,4 +1,4 @@
-export const activeAccount = (verifyLink) => {
+export const mailActiveAccount = (verifyLink) => {
     return `
     <body
         marginheight="0"

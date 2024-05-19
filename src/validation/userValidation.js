@@ -9,6 +9,8 @@ class userValidation {
             user_name: Joi.string().min(3).max(20).trim(),
             bio: Joi.string().trim(),
             website: Joi.string().trim(),
+            password: Joi.string().min(6).trim(),
+            confirm_password: Joi.string().min(6).valid(Joi.ref("password")).trim(),
             gender: Joi.number(),
             phone: Joi.string()
               .pattern(PHONE_NUMBER_RULE)
