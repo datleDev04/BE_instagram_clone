@@ -4,8 +4,8 @@ import nodemailer from 'nodemailer'
 let transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-      user: 'datltph41025@fpt.edu.vn', // Thay đổi email và mật khẩu của bạn
-      pass: 'aaak ursv cuil gwym' // Thay đổi email và mật khẩu của bạn
+      user: process.env.MAIL_ADMIN, 
+      pass: process.env.MAIL_PASS 
   }
 });
 
