@@ -48,6 +48,13 @@ class userService {
 
         let updatedData = { ...req.body };
 
+        if (req.body.phone) {
+            const exitstedPhone = await User.findOne({ phone: req.body.phone })
+            if (exitstedPhone){
+                throw new ApiError(StatusCodes.BAD_REQUEST, "This phone is already used")
+            }
+        }
+
         if (req.body.password) {
             updatedData.password = bcrypt.hashSync(req.body.password, 10);
         }
