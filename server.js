@@ -8,6 +8,7 @@ import connectDatabase from './src/configs/database.js'
 import environment from './src/configs/enviroment.js'
 import { errorHandlingMiddleware } from './src/middleware/errorHandlingMiddleware.js'
 import ApiError from './src/utils/ApiError.js'
+import cors from 'cors'
 
 const PORT = environment.app.port;
 
@@ -16,6 +17,7 @@ const app = express()
 connectDatabase();
 
 // init middleware
+app.use(cors())
 app.use(morgan("dev"))
 app.use(helmet())
 app.use(compression())
