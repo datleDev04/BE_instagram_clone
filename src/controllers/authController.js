@@ -41,6 +41,7 @@ class authController {
         }
     }
 
+
     static forgotPassword = async (req, res, next) => {
         try {
             await authService.forgotPassword(req.body)

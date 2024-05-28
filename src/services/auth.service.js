@@ -65,15 +65,22 @@ class authService {
             throw new ApiError(401, "Wrong password")
         }
 
+        const existingToken = await Token.findOne({ user_id: user._id })
 
-        // create accesstoken and refresh token
         const accessToken = jwtUtils.createAccessToken(user._id)
-        const refreshToken = jwtUtils.createRefreshToken()
 
-        await Token.create({
-            user_id: user._id,
-            refresh_token: refreshToken,
-        })
+        if (!existingToken) {
+            // create accesstoken and refresh token
+            const refreshToken = jwtUtils.createRefreshToken()
+
+            await Token.create({
+                user_id: user._id,
+                refresh_token: refreshToken,
+            })
+        } else {
+            existingToken.refresh_token = jwtUtils.createRefreshToken()
+            existingToken.save()
+        }
 
         return {
             user,
@@ -126,7 +133,7 @@ class authService {
         sendEmail(
             user.email,
             "Active your Instagram account (new verify code)",
-            activeAccount(
+            mailActiveAccount(
                 `${process.env.CLIENT_BASE_URL}/verify?email=${user.email}&code=${newVerifyCode}`
             )
         )

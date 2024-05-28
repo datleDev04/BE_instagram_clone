@@ -1,7 +1,7 @@
 
 const dev = {
     app: {
-        port: process.env.DEV_APP_PORT || 3000
+        port: process.env.DEV_APP_PORT || 8080
     },
     db: {
         host : process.env.DEV_DB_HOST || 'localhost',
@@ -14,7 +14,7 @@ const dev = {
 // môi trường product tính sau
 const pro = {
     app: {
-        port: process.env.PRO_APP_PORT || 3000
+        port: process.env.PRO_APP_PORT || 8080
     },
     db: {
         host : process.env.PRO_DB_HOST || 'localhost',
