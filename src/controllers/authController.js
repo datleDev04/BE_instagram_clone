@@ -16,13 +16,14 @@ class authController {
     }
     static login = async (req, res, next) => {
         try {
-            const { user, accessToken } = await authService.login(req.body)
+            const { user, accessToken, refreshToken } = await authService.login(req.body)
 
             res.status(StatusCodes.OK).json({
                 message: "Login successfully",
                 metaData: {
                     userData: user,
-                    accessToken: accessToken
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
                 }
             })
         } catch (error) {

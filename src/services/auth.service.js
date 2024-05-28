@@ -20,6 +20,12 @@ class authService {
             throw new ApiError(409, "Email already existed")
         }
 
+        // check exitsted user_name
+        const existedUserName = await User.findOne({ user_name })
+        if (existedUserName) {
+            throw new ApiError(409, "user_name already existed")
+        }
+
         // check password and confirm_password
         if (password !== confirm_password) {
             throw new ApiError(400, "Passwords don't match")
@@ -56,7 +62,7 @@ class authService {
         const user = await User.findOne({ email })
 
         if (!user) {
-            throw new ApiError(404, "Couldn't find User")
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Couldn't find User")
         }
 
         // compare password
@@ -69,22 +75,23 @@ class authService {
 
         const accessToken = jwtUtils.createAccessToken(user._id)
 
+        // create  refresh token
+        const refreshToken = jwtUtils.createRefreshToken()
         if (!existingToken) {
-            // create accesstoken and refresh token
-            const refreshToken = jwtUtils.createRefreshToken()
 
             await Token.create({
                 user_id: user._id,
                 refresh_token: refreshToken,
             })
         } else {
-            existingToken.refresh_token = jwtUtils.createRefreshToken()
+            existingToken.refresh_token = refreshToken
             existingToken.save()
         }
 
         return {
             user,
-            accessToken
+            accessToken,
+            refreshToken
         }
     }
 
