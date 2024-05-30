@@ -27,6 +27,12 @@ class jwtUtils {
 
         return jwt.verify(token, ACCESS_SECRET)
     }
+    
+    static decodeRefreshToken = token => {
+        const { REFRESH_SECRET } = process.env
+
+        return jwt.verify(token, REFRESH_SECRET)
+    }
 }
 
 export default jwtUtils

@@ -15,6 +15,14 @@ const tokenSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    device_info: {
+        type: String,
+        required: true
+    },
+    ip_address: {
+        type: String,
+        required: true
+    }
 },
 {
     timestamps: true,

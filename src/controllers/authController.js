@@ -16,7 +16,7 @@ class authController {
     }
     static login = async (req, res, next) => {
         try {
-            const { user, accessToken, refreshToken } = await authService.login(req.body)
+            const { user, accessToken, refreshToken } = await authService.login( req ) 
 
             res.status(StatusCodes.OK).json({
                 message: "Login successfully",
@@ -32,7 +32,7 @@ class authController {
     }
     static logout = async (req, res, next) => {
         try {
-            await authService.logout(req.user.accessToken)
+            await authService.logout(req)
 
             res.status(StatusCodes.OK).json({
                 message: "Logout successfully",
@@ -68,11 +68,12 @@ class authController {
 
     static refreshToken = async (req, res, next) => {
         try {
-            const newAccess_token = await authService.refreshToken(req.body)
-
+            const {access_token, refresh_token } = await authService.refreshToken(req)
+ 
             res.status(StatusCodes.OK).json({
                 message: "Refresh token successfully",
-                accessToken: newAccess_token
+                accessToken: access_token,
+                refresh_token: refresh_token
             })
         } catch (error) {
             next(error)
