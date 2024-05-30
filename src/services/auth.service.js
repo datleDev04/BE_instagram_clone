@@ -8,6 +8,8 @@ import Token from "../models/token.js"
 import sendEmail from "../utils/mails.js"
 import {  mailActiveAccount } from "../mail/mailActiveAcount.js"
 import { mailForgotPassword } from "../mail/mailForgotPassword.js"
+import userUtils from "../utils/user.js"
+import jwt from 'jsonwebtoken'
 
 class authService {
     static register = async (reqBody) => {
@@ -55,8 +57,8 @@ class authService {
         return newUser
     }
 
-    static login = async (reqBody) => {
-        const { email, password } = reqBody
+    static login = async (req) => {
+        const { email, password } = req.body
 
         // find user by email
         const user = await User.findOne({ email })
@@ -71,20 +73,33 @@ class authService {
             throw new ApiError(401, "Wrong password")
         }
 
-        const existingToken = await Token.findOne({ user_id: user._id })
+        // check account status
+        userUtils.checkUserStatus(user.status)
+
+        // Lấy thông tin thiết bị và địa chỉ IP
+        const deviceInfo = req.headers['user-agent'];
+        const ipAddress = req.ip;
+
+        const existingToken = await Token.findOne({ 
+            user_id: user._id,
+            device_info: deviceInfo,
+            ip_address: ipAddress,
+        })
 
         const accessToken = jwtUtils.createAccessToken(user._id)
 
-        // create  refresh token
+        // create refresh token
         const refreshToken = jwtUtils.createRefreshToken()
         if (!existingToken) {
 
             await Token.create({
                 user_id: user._id,
                 refresh_token: refreshToken,
+                device_info: deviceInfo,
+                ip_address: ipAddress,
             })
         } else {
-            existingToken.refresh_token = refreshToken
+            refreshToken = existingToken.refresh_token
             existingToken.save()
         }
 
@@ -95,33 +110,56 @@ class authService {
         }
     }
 
-    static logout = async (accessToken) => {
-        const { user_id } = jwtUtils.decodeToken(accessToken)
+    static logout = async (req) => {
+        const { user_id } = jwtUtils.decodeToken(req.user.accessToken)
+
+        // Lấy thông tin thiết bị và địa chỉ IP
+        const deviceInfo = req.headers['user-agent'];
+        const ipAddress = req.ip;   
 
         await Black_tokens.create({
             user_id,
             access_token: accessToken,
         })
 
-        await Token.findOneAndDelete({ user_id })
+        await Token.findOneAndDelete({
+            user_id: user_id,
+            device_info: deviceInfo,
+            ip_address: ipAddress,
+        })
     }
 
-    static refreshToken = async (reqBody) => {
-        const refreshToken = reqBody.refreshToken
+    static refreshToken = async (req) => {
+        const refreshToken = req.body.refreshToken
+        // Lấy thông tin thiết bị và địa chỉ IP
+        const deviceInfo = req.headers['user-agent'];
+        const ipAddress = req.ip;
 
         if (!refreshToken) throw new ApiError(StatusCodes.BAD_REQUEST, "refresh token is required")
+        
+        // check valid token
+        const decodeToken = jwtUtils.decodeRefreshToken(refreshToken)
+        if (!decodeToken) throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid refresh token")
 
-        const tokenInfo = await Token.findOne({ refresh_token: refreshToken })
+        const tokenInfo = await Token.findOne({
+            refresh_token: refreshToken,
+            device_info: deviceInfo,
+            ip_address: ipAddress,
+        })
+
         if (!tokenInfo) throw new ApiError(StatusCodes.UNAUTHORIZED, "token is unauthorized")
 
 
-        await Token.findOneAndUpdate({ user_id: tokenInfo.user_id }, {
-            refresh_token: jwtUtils.createRefreshToken(),
-        })
+
+        tokenInfo.refresh_token = jwtUtils.createRefreshToken(),
+        tokenInfo.save()
 
         const access_token = jwtUtils.createAccessToken(tokenInfo.user_id)
 
-        return access_token
+        return {
+            access_token: access_token,
+            refresh_token: tokenInfo.refresh_token,
+        }
     }
 
     static reSendVerifyCode = async (accessToken) => {

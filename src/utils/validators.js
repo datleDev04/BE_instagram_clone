@@ -6,5 +6,5 @@ export const PHONE_NUMBER_RULE_MESSAGE = 'Your phone number fails to match the p
 
 
 export const validateBeforeCreateOrUpdate = async (correct_Condition, data) => {
-  return await correct_Condition.validateAsync(data, { abortEarly: false })
+  return await correct_Condition.validateAsync(data,  { abortEarly: false })
 }
