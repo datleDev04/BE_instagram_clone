@@ -10,6 +10,7 @@ import {  mailActiveAccount } from "../mail/mailActiveAcount.js"
 import { mailForgotPassword } from "../mail/mailForgotPassword.js"
 import userUtils from "../utils/user.js"
 import jwt from 'jsonwebtoken'
+import { token } from "morgan"
 
 class authService {
     static register = async (reqBody) => {
@@ -80,28 +81,19 @@ class authService {
         const deviceInfo = req.headers['user-agent'];
         const ipAddress = req.ip;
 
-        const existingToken = await Token.findOne({ 
-            user_id: user._id,
-            device_info: deviceInfo,
-            ip_address: ipAddress,
-        })
-
+        // create access token
         const accessToken = jwtUtils.createAccessToken(user._id)
 
         // create refresh token
-        const refreshToken = jwtUtils.createRefreshToken()
-        if (!existingToken) {
+        let refreshToken = jwtUtils.createRefreshToken()
 
-            await Token.create({
-                user_id: user._id,
-                refresh_token: refreshToken,
-                device_info: deviceInfo,
-                ip_address: ipAddress,
-            })
-        } else {
-            refreshToken = existingToken.refresh_token
-            existingToken.save()
-        }
+        await Token.create({
+            user_id: user._id,
+            refresh_token: refreshToken,
+            device_info: deviceInfo,
+            ip_address: ipAddress,
+        });
+
 
         return {
             user,
@@ -112,28 +104,45 @@ class authService {
 
     static logout = async (req) => {
         const { user_id } = jwtUtils.decodeToken(req.user.accessToken)
+        const { refreshToken, logoutAll, deviceInfo , ipAddress  } = req.body;
 
-        // Lấy thông tin thiết bị và địa chỉ IP
-        const deviceInfo = req.headers['user-agent'];
-        const ipAddress = req.ip;   
 
-        await Black_tokens.create({
-            user_id,
-            access_token: accessToken,
-        })
+        // loug out all devices
+        if (logoutAll == true) {
+            const refreshTokenDocs = await Token.find({ 
+                user_id: user_id,
+                // tất cả các token trừ refreshtoken hiện tại đang sử dụng
+                refresh_token: { $ne: refreshToken }
+            })
+            refreshTokenDocs.forEach(async (refreshTokenDoc) => {
+                await Black_tokens.create({ refresh_token: refreshTokenDoc.refresh_token })
+            })
+        } else if (deviceInfo && ipAddress) {
+            const refreshTokenDocs = await Token.find({
+                device_info: deviceInfo,
+                ip_address: ipAddress,
+                user_id: user_id,
+                refresh_token: { $ne: refreshToken }
+            })
 
-        await Token.findOneAndDelete({
-            user_id: user_id,
-            device_info: deviceInfo,
-            ip_address: ipAddress,
-        })
+            refreshTokenDocs.forEach(async (refreshTokenDoc) => {
+                await Black_tokens.create({ refresh_token: refreshTokenDoc.refresh_token })
+            })
+
+            await Token.deleteMany({
+                user_id: user_id,
+                device_info: deviceInfo,
+                ip_address: ipAddress,
+                refresh_token: { $ne: refreshToken }
+            })
+        } else {
+            await Black_tokens.create({ refresh_token: refreshToken })
+            await Token.findOneAndDelete({ refresh_token: refreshToken });
+        }
     }
 
     static refreshToken = async (req) => {
         const refreshToken = req.body.refreshToken
-        // Lấy thông tin thiết bị và địa chỉ IP
-        const deviceInfo = req.headers['user-agent'];
-        const ipAddress = req.ip;
 
         if (!refreshToken) throw new ApiError(StatusCodes.BAD_REQUEST, "refresh token is required")
         
@@ -142,9 +151,7 @@ class authService {
         if (!decodeToken) throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid refresh token")
 
         const tokenInfo = await Token.findOne({
-            refresh_token: refreshToken,
-            device_info: deviceInfo,
-            ip_address: ipAddress,
+            refresh_token: refreshToken
         })
 
         if (!tokenInfo) throw new ApiError(StatusCodes.UNAUTHORIZED, "token is unauthorized")
