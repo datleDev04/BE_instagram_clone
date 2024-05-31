@@ -20,7 +20,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 // get the profile account
-userRouter.get('/:id/profile', userController.getUserProfile)
+userRouter.get('/:id/profile',authMiddleware, userController.getUserProfile)
 
 // update infor of the user
 userRouter.patch('/:id', 
@@ -33,16 +33,16 @@ userRouter.patch('/:id',
 
 
 // get the follower
-userRouter.get('/:id/followers', userController.getAllFollwers)
+userRouter.get('/:id/followers',authMiddleware, userController.getAllFollwers)
 
 // get the followings account
-userRouter.get('/:id/followings', userController.getAllFollwings)
+userRouter.get('/:id/followings',authMiddleware, userController.getAllFollwings)
 
 // get the close friends list
-userRouter.get('/:id/closefriends', userController.getAllCloseFriends)
+userRouter.get('/:id/closefriends', authMiddleware,userController.getAllCloseFriends)
 
 // get the blocked list
-userRouter.get('/:id/blocked', userController.getAllBlocked)
+userRouter.get('/:id/blocked',authMiddleware, userController.getAllBlocked)
 
 // follow a person with public account
 // send follow request with private account

@@ -35,8 +35,8 @@ authRouter.post("/reset-password/:token", authController.resetPassword)
 
 
 authRouter.post("/refresh-token", authController.refreshToken)
-authRouter.post("/reSend-verifyCode", authMiddleware, authController.reSendVerifyCode)
-authRouter.post("/verifyCode", authMiddleware, authController.verifyCode)
+authRouter.post("/reSend-verifyCode", authController.reSendVerifyCode)
+authRouter.post("/verifyCode", authController.verifyCode)
 
 
 export default authRouter

@@ -82,7 +82,7 @@ class authController {
 
     static reSendVerifyCode = async (req, res, next) => {
         try {
-            await authService.reSendVerifyCode(req.user.accessToken)
+            await authService.reSendVerifyCode(req)
 
             res.status(StatusCodes.OK).json({
                 message: "Resend verify code successfully",

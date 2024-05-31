@@ -9,8 +9,6 @@ import sendEmail from "../utils/mails.js"
 import {  mailActiveAccount } from "../mail/mailActiveAcount.js"
 import { mailForgotPassword } from "../mail/mailForgotPassword.js"
 import userUtils from "../utils/user.js"
-import jwt from 'jsonwebtoken'
-import { token } from "morgan"
 
 class authService {
     static register = async (reqBody) => {
@@ -169,14 +167,14 @@ class authService {
         }
     }
 
-    static reSendVerifyCode = async (accessToken) => {
-        const { user_id } = jwtUtils.decodeToken(accessToken)
+    static reSendVerifyCode = async (req) => {
+        const email = req.body.email
 
         const newVerifyCode = (Math.random() + new Date().getTime())
         .toString()
         .replace(".", "");
 
-        const user = await User.findOneAndUpdate({ _id: user_id, status: 0}, {
+        const user = await User.findOneAndUpdate({ email, status: 0}, {
             verify_code: newVerifyCode,
         })
 
@@ -202,7 +200,7 @@ class authService {
         
         user.status = 1;
         user.verify_code = null
-        
+
         user.save()
     }
 
