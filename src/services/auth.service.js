@@ -199,8 +199,11 @@ class authService {
         const user = await User.findOne({ verify_code: verifyCode, status: 0 })
 
         if (!user) throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid vertify code")
-
+        
+        user.status = 1;
         user.verify_code = null
+        
+        user.save()
     }
 
     static forgotPassword = async (reqBody) => {
